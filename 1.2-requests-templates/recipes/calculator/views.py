@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
 DATA = {
     'omlet': {
@@ -16,8 +17,26 @@ DATA = {
         'сыр, ломтик': 1,
         'помидор, ломтик': 1,
     },
-    # можете добавить свои рецепты ;)
 }
+
+
+def index(request):
+    link = []
+    for recipe in DATA.keys():
+        link.append(f'<a href="/{recipe}/">{recipe}</a><br>')
+    return HttpResponse(link)
+
+
+def get_recipe(request):
+    servings = int(request.GET.get('servings', 1))
+    recipe_request = request.path[1:].replace('/', '')
+    recipe = {}
+    if recipe_request in DATA.keys():
+        for key, value in DATA[recipe_request].items():
+            recipe[key] = f'{servings * value:.2f}'
+
+    context = {'recipe': recipe}
+    return render(request, 'calculator/index.html', context)
 
 # Напишите ваш обработчик. Используйте DATA как источник данных
 # Результат - render(request, 'calculator/index.html', context)
