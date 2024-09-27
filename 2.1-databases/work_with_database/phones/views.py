@@ -10,12 +10,14 @@ def show_catalog(request):
     template = 'catalog.html'
     data = Phone.objects.all()
     sort_pages = request.GET.get('sort')
-    if sort_pages == 'min_price':
-        data = data.order_by('price')
-    elif sort_pages == 'max_price':
-        data = data.order_by('-price')
-    elif sort_pages == 'name':
-        data = data.order_by('name')
+    match sort_pages:
+        case 'name':
+            data = data.order_by('name')
+        case 'min_price':
+            data = data.order_by('price')
+        case 'max_price':
+            data = data.order_by('-price')
+
     context = {"phones": data
                }
     return render(request, template, context)
