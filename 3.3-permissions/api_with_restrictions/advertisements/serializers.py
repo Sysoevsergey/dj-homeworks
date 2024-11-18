@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name',
-                  'last_name',)
+                  'last_name', 'email', )
 
 
 class AdvertisementSerializer(serializers.ModelSerializer):
@@ -24,6 +24,7 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         model = Advertisement
         fields = ('id', 'title', 'description', 'creator',
                   'status', 'created_at', )
+        read_only_fields = ('creator', )
 
     def create(self, validated_data):
         """Метод для создания"""
@@ -41,5 +42,12 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         """Метод для валидации. Вызывается при создании и обновлении."""
 
         # TODO: добавьте требуемую валидацию
+        if self.context["request"].method == "POST" or self.context["request"].method == "PATCH":
+            user = self.context["request"].user
+            open_adv = Advertisement.objects.filter(creator=user, status="OPEN").count()
+            if data.get("status") == "CLOSED":
+                return data
+            if open_adv >= 11:
+                raise serializers.ValidationError("Вы не можете создать больше 10 объявлений")
 
         return data
