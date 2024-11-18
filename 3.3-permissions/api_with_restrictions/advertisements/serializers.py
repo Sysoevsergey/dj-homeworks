@@ -41,7 +41,6 @@ class AdvertisementSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Метод для валидации. Вызывается при создании и обновлении."""
 
-        # TODO: добавьте требуемую валидацию
         if self.context["request"].method == "POST" or self.context["request"].method == "PATCH":
             user = self.context["request"].user
             open_adv = Advertisement.objects.filter(creator=user, status="OPEN").count()
